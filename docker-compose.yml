@@ -1,0 +1,26 @@
+mysql-zabbix:
+  environment:
+    - MYSQL_ROOT_PASSWORD=zabbix123456
+    - MYSQL_DATABASE=zabbix
+  image: "mysql/mysql-server:5.7"
+zabbix-server:
+  environment:
+    - DB_SERVER_HOST=mysql-zabbix
+    - MYSQL_USER=root
+    - MYSQL_PASSWORD=zabbix123456
+  image: "zabbix/zabbix-server-mysql:alpine-3.2-latest"
+  links:
+    - mysql-zabbix
+zabbix-web:
+  environment:
+    - DB_SERVER_HOST=mysql-zabbix
+    - MYSQL_USER=root
+    - MYSQL_PASSWORD=zabbix123456
+    - ZBX_SERVER_HOST=zabbix-server
+    - TZ="Asia/Bangkok"
+  image: "zabbix/zabbix-web-apache-mysql:alpine-3.2-latest"
+  links:
+    - mysql-zabbix
+    - zabbix-server
+  ports:
+    - "8080:80"
